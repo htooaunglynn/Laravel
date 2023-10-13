@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Laptop;
+use Illuminate\Support\Facades\Storage;
 
 class LaptopController extends Controller
 {
@@ -48,10 +49,13 @@ class LaptopController extends Controller
         // $test = $request->file('img')->getMimeType();
 
         $newImg = time() . '-' . $request->brand . '.' . $request->img->extension();
+        // $string = str_replace(' ', '', $newImg);
+        // $string2 = str_replace('-', '', $string);
 
         $test = $request->img->move(public_path('images'), $newImg);
 
-        // dd($newImg);
+
+        // dd($string2);
 
         // dd($test);
         Laptop::create([
@@ -117,12 +121,23 @@ class LaptopController extends Controller
     public function destroy(Laptop $laptop)
     {
         $img = $laptop->img;
-        $image_path = public_path('images') . $img;
+        $image_path = public_path("images\\$img");
         // dd($image_path);
-        if(Laptop::exists($image_path)) {
-            Laptop::delete($image_path);
+        // Storage::delete($image_path);
+        // dd($image_path);
+        if (file_exists($image_path)) {
+            // Storage::delete($image_path);
+            unlink($image_path);
+            // Storage::delete([$img, $image_path]);
+            // Storage::deleteDirectory($image_path);
         }
-        $laptop->delete();
+
+        // if(Laptop::exists($image_path)) {
+            //     // Laptop::delete($image_path);
+            //     // unlink($image_path);
+            //     Storage::delete($image_path);
+            // }
+            $laptop->delete();
         return redirect(route('laptop'))->with('success', 'Product Delete Successfully');
     }
 }
